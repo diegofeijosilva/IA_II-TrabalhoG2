@@ -6,7 +6,7 @@ import com.trabalho.enuns.RotaEnum;
 
 public class Cromossomo {
 	
-	private String[] gene = new String[9];
+	private String[] gene = new String[8];
 	private Integer aptidao;
 	
 	public Cromossomo() {
@@ -21,24 +21,25 @@ public class Cromossomo {
 	private void calculaAptidao() {
 
 		Integer somador=0;
-		
+		String cidades;
 		int y=1;
 		for(int i = 0; i < gene.length; i++){
-			
-			String cidades;
-			
+
 			if(y < gene.length){
-				cidades = this.gene[i]+this.gene[y];
-				
+				cidades = this.gene[i] + this.gene[y];
 				somador += getDistanciaCidade(cidades);
 			}
 			
 			y++;
 		}
 
-		this.aptidao = Math.abs(somador);
+		y = gene.length;
 		
-		System.out.println("Valor Aptidão: " + this.aptidao);
+		// CALCULA A ULTIMA CIDADE
+		cidades = this.gene[0] + this.gene[--y];
+		somador += getDistanciaCidade(cidades);
+
+		this.aptidao = somador;
 		
 	}
 	
@@ -115,6 +116,7 @@ public class Cromossomo {
 	}
 
 	public Integer getAptidao(){
+		this.calculaAptidao();
 		return this.aptidao;
 	}
 	
@@ -122,14 +124,29 @@ public class Cromossomo {
 		return this.gene[posicao];
 	}
 	
+	public String[] getGene(){
+		return this.gene;
+	}
+	
 	public void setGene(int posicao, String value){
 		this.gene[posicao] = value;
 	}
 	
+	public void setGene(String[] gene){
+		this.gene = gene;
+	}
+	
 	@Override
 	public String toString() {
-		String ret = Arrays.toString(gene);
-		return ret + ": Aptidao: " + this.aptidao.toString();
+		String ret = "{";
+
+		for (String s : gene) {
+			ret += s + ", ";
+		}
+		
+		ret += this.getGene(0);
+		ret += "}";
+		return ret + ": Aptidao: " + this.getAptidao().toString();
 	}
 	
 }
