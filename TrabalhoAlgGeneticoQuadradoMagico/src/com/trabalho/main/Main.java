@@ -3,6 +3,7 @@ package com.trabalho.main;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -12,13 +13,15 @@ import com.trabalho.model.Cromossomo;
 
 public class Main {
 
-	private static final int TOTAL_INTERACOES = 10000;
+	private static final int TOTAL_INTERACOES = 50;
 	
 	private List<Cromossomo> listaCromossomo = new ArrayList<Cromossomo>();
 	private Integer qtdIteracoes=0;
 	
 	private Integer numeroMagico;
 	private Integer tamanhoMatriz;
+	
+	Random random = new Random();
 	
 	public static void main(String[] args) {
 
@@ -33,35 +36,64 @@ public class Main {
 
 		this.iniciaPopulacao();
 		
-		while(!objetivoAtingido()) {
+		while(this.verificaNumeroMagicoLinhas()) {
 			
 			qtdIteracoes++;
 			System.out.println("GERAÇÃO " + qtdIteracoes + "\n");
-			this.printCromossomos();
+			//this.printCromossomos();
+			
+			this.printQuadradoMagico();
 			
 			//O melhor permanecerá na lista
 			Cromossomo pai1 = obtemMelhorCromossomo();
 			listaCromossomo.remove(pai1);
+			
 			Cromossomo pai2 = obtemMelhorCromossomo();
-			listaCromossomo.remove(pai2);			
+			listaCromossomo.remove(pai2);		
 			
-			Cromossomo filho1 = realizaCruzamento(pai1, pai2);
 			
-			// ADICIONA OS FILHOS
+			Cromossomo filho1 = realizaCruzamento(pai1, pai2);;
+			Cromossomo filho2 = realizaCruzamento(pai2, pai1);;
+
 			listaCromossomo.add(filho1);
-			
-			// MANTÉM O MELHOR CROMOSSOMO DESTA GERAÇÃO
-			listaCromossomo.add(pai1);
+			listaCromossomo.add(filho2);
+
 
 		}
 		
 		//System.out.println("\n\nMelhor cromossomo em " + qtdIteracoes + " gerações:\n" + obtemMelhorCromossomo());
-		System.out.println("\nCromossomos Resultantes:");
-		this.printCromossomos();
+//		System.out.println("\nCromossomos Resultantes:");
+//		this.printCromossomos();
+		
+		this.printQuadradoMagico();
 
 	}
 
-
+	private void printQuadradoMagico(){
+		
+		System.out.println("-------------------");
+		for (Cromossomo cromossomo : listaCromossomo) {
+			System.out.println(cromossomo.getValores());
+		}
+		System.out.println("-------------------");
+		
+	}
+	
+	// VERIFICA SE O TOTAL DE CADA LINHA CHEGOU AO NUMERO MÁGICO
+	private boolean verificaTotalLinha(){
+		
+		for (Cromossomo c : listaCromossomo) {
+			if(c.getAptidao() != numeroMagico) return false;
+		}
+		
+		return true;
+		
+	}
+	
+	// VERIFICA SE O TOTAL DE CADA COLUNA CHEGOU AO NUMERO MÁGICO
+	private boolean verificaTotalColuna(){
+		return false;
+	}
 
 	private void printCromossomos() {
 
@@ -75,65 +107,68 @@ public class Main {
 	
 	private Cromossomo realizaMutacao(Cromossomo p1){
 		
-//		Random random = new Random();
-//		
-//		int pos1 = random.nextInt(8);
-//		int pos2 = random.nextInt(8);
-//	
-//		String cidade1 = p1.getGene(pos1);
-//		String cidade2 = p1.getGene(pos2);
-//		
-//		p1.setGene(pos2, cidade1);
-//		p1.setGene(pos1, cidade2);
-//		
-//		return p1;
 		
-		return null;
+		
+		int pos1 = random.nextInt(tamanhoMatriz-1);
+		int pos2 = random.nextInt(tamanhoMatriz-1);
+	
+		Integer cidade1 = p1.getGene(pos1);
+		Integer cidade2 = p1.getGene(pos2);
+		
+		p1.setGene(pos2, cidade1);
+		p1.setGene(pos1, cidade2);
+		
+		return p1;
 	}
 	
-	// DE 2 PAIS RETORNA 1 FILHOS
+	// DE 2 PAIS RETORNA 1 FILHO
 	private Cromossomo realizaCruzamento(Cromossomo p1, Cromossomo p2){
 		
 		List<Integer> genesFilho1 = new ArrayList<Integer>(Arrays.asList(p2.getGene(0), p2.getGene(1), p1.getGene(2), p1.getGene(3)));
 		
 		Cromossomo filho = new Cromossomo(genesFilho1);
 		
-//		Cromossomo filho = new Cromossomo(new String[]{p1.getGene(0), p1.getGene(1), p1.getGene(2), p1.getGene(3), p2.getGene(4), p2.getGene(5), p2.getGene(6), p2.getGene(7)});
-//		
-//		int i = 0;
-//		String valores[] = new String[] {"A","B","C","D","E","F","G","H"};
-//		while(this.verificaDuplicidades(filho.getGene()) != -1){
-//		
-//			int posTroca = this.verificaDuplicidades(filho.getGene());
-//			
-//			if(i>filho.getGene().length) i=0; 
-//
-//			filho.setGene(posTroca, valores[i++]);
-//			
-//		}
-//		
-//		// GARANTE QUE NÃO HOUVE DUPLICIDADE
-//		filho.setGene(this.removeRepetidos(filho.getGene()));
-//		
-//		return realizaMutacao(filho);
 		
-		return filho;
+		return this.realizaMutacao(filho);
 	}
 	
 	private Cromossomo obtemMelhorCromossomo() {
 		
-		Cromossomo melhorCrom = listaCromossomo.get(0);
+		//this.ordenaGenesPelaAptidao(listaCromossomo);
+		
+		// PEGA ALEATÓRIO
+		while(true){
+			Cromossomo melhorCrom = listaCromossomo.get(random.nextInt(3));
+			
+			if(melhorCrom.getAptidao() != numeroMagico) return melhorCrom;
+			
+		}
+		
+	}
+	
+	private boolean verificaNumeroMagicoLinhas(){
 
 		for (Cromossomo crom : listaCromossomo) {
 			
-			if (crom.getAptidao() == numeroMagico) {
-				melhorCrom = crom;
+			if (crom.getAptidao() != numeroMagico) {
+				return true;
 			}
 
 		}
-
-		return melhorCrom;
+		
+		return false;
 	}
+	
+	// Para ordenar por numeros  
+    private static void ordenaGenesPelaAptidao(List<Cromossomo> lista) {  
+        Collections.sort(lista, new Comparator<Cromossomo>() {  
+            @Override  
+            public int compare(Cromossomo o1, Cromossomo o2) {  
+                return o1.getAptidao().compareTo(o2.getAptidao());  
+            }  
+           
+     });  
+    }  
 	
 	private Boolean objetivoAtingido() {
 
@@ -143,20 +178,22 @@ public class Main {
 
 	private void iniciaPopulacao() {
 		
-		Random random = new Random();
+		int contador = 0;
+		
+		// POPULAÇÃO INICIADA PARA UM QUADRADO DE 4 LINHAS E 4 COLUNAS
 		for(int i=0; i < tamanhoMatriz; i++){
-			
-			// MONTA OS GENES
-			List<Integer> genes = new ArrayList<Integer>();
-			for (int j = 0; j < tamanhoMatriz; j++) {
-				genes.add(random.nextInt(numeroMagico/tamanhoMatriz));
-			}
-			
-			// ADICIONA O CROMOSSOMO COM OS GENES
-			listaCromossomo.add(new Cromossomo(genes));
-			
-		}
 
+		// MONTA OS GENES
+		List<Integer> genes = new ArrayList<Integer>();
+		for (int j = 0; j < tamanhoMatriz; j++) {
+			contador++;
+			genes.add(contador);
+		}
+		
+		// ADICIONA O CROMOSSOMO COM OS GENES
+		listaCromossomo.add(new Cromossomo(genes));
+		
+	}
 	}
 	
 	private void getEntradaDados() {

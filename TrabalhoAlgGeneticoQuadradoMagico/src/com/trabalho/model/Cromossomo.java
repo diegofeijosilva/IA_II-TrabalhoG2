@@ -14,6 +14,7 @@ public class Cromossomo {
 	}
 	
 	private void calculaAptidao() {
+		this.aptidao = 0;
 		for (Integer i : genes) {
 			this.aptidao += i;
 		}	
@@ -27,6 +28,14 @@ public class Cromossomo {
 	public Integer getGene(Integer pos){
 		return genes.get(pos);
 	}
+	
+	public void setGene(Integer pos, Integer valor){
+		this.genes.set(pos, valor);
+	}
+	
+	public List<Integer> getListaGene(){
+		return this.genes;
+	}
 
 	@Override
 	public String toString() {
@@ -38,6 +47,21 @@ public class Cromossomo {
 
 		ret += "}";
 		return ret + ": Aptidao: " + this.getAptidao().toString();
+	}
+	
+	public String getValores(){
+		
+		String ret = "";
+		Integer total=0;
+
+		for (Integer i : genes) {
+			total += i;
+			ret += "|"+i+"|";
+		}
+		
+		ret += " = " + this.aptidao;
+		
+		return ret;
 	}
 	
 }
